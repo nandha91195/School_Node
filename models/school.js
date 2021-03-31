@@ -1,20 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// const studentObject = new Schema({
-//   studentId: {
-//     type: mongoose.Types.ObjectId,
-//     ref: "Students",
-//   },
-// });
-
-// const classesObject = new Schema({
-//   classId: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "Class",
-//   },
-//   students: [studentObject],
-// });
 
 const schoolDetails = new Schema(
   {
@@ -37,3 +23,19 @@ const schoolDetails = new Schema(
 );
 
 module.exports = School = mongoose.model("School", schoolDetails);
+
+
+// const studentObject = new Schema({
+//   studentId: {
+//     type: mongoose.Types.ObjectId,
+//     ref: "Students",
+//   },
+// });
+
+// const classesObject = new Schema({
+//   classId: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: "Class",
+//   },
+//   students: [studentObject],
+// });

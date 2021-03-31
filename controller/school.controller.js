@@ -86,7 +86,7 @@ module.exports.getOne = async (req, res) => {
 
   let err, exisitingSchool;
 
-  [err, exisitingSchool] = await to(School.findById(req.params.id).populate([{
+  [err, exisitingSchool] = await to(School.findById(req.body.id).populate([{
     path:"classes",
     select:["className"],
     model:"Class",

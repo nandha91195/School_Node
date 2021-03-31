@@ -21,3 +21,52 @@ module.exports.createClass = async (req, res) => {
 
   if (newClass) { return ReS( res, { message: "Class Created Sucessfully", class: newClass }, HttpStatus.OK )}
 };
+
+
+module.exports.createSection = async(req,res) =>{
+
+  let err, existingClassName , newSection
+
+  [err,existingClassName] = await to(Class.findById(req.body.id));
+
+  if(err){ return ReE(res,err,HttpStatus.BAD_REQUEST)};
+
+  if(!existingClassName) {return ReE(res,{message:"className is not exist"},HttpStatus.BAD_REQUEST)}
+
+  let data = { sectionName:req.body.sectionName };
+
+  existingClassName.section.push(data);
+
+  [err,newSection] = await to(existingClassName.save());
+  
+  if(err){return ReE(res,err,HttpStatus.BAD_REQUEST)}
+
+  return ReS(res,{message:"saved sucessfully", section:newSection},HttpStatus.OK)
+}
+
+exports.getAll = async (req, res) => {
+  let err, exisistingSection;
+  let query = req.query;
+
+  [err, exisistingSection] = await to(
+    Class.find({ ...query }).populate({
+      path: "schoolName",
+      model: "School",
+      select: "schoolName",
+    })
+  );
+
+  if (err) {
+    return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  if (!exisistingSection) {
+    ReE(res, { message: "Unhandled Error" }, HttpStatus.BAD_REQUEST);
+  }
+
+  return ReS(
+    res,
+    { message: "Section fetched", section: exisistingSection },
+    HttpStatus.OK
+  );
+};

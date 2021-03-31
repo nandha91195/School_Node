@@ -7,6 +7,15 @@ let classDetails = new Schema(
       type: String,
       required: true,
     },
+
+    section: [
+      {
+        sectionName: {
+          type: String,
+        }
+      }
+    ],
+    
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",

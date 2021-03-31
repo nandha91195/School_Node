@@ -17,6 +17,7 @@ module.exports.ReE = function (res, err, code) { // Error Web Response
     return res.json({ success: false, error: err });
 };
 
+
 module.exports.ReS = function (res, data, code) { // Success Web Response
     let send_data = { success: true };
 

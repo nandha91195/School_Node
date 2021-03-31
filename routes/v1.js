@@ -15,6 +15,7 @@ router.post('/student/create',studentController.createStudent);
 
 router.post('/student/assignClass',schoolController.assignClasses);
 router.get('/school/get',schoolController.getOne);
-
+router.post('/section/create',classController.createSection);
+router.get('/class/getAll',classController.getAll);
 
 module.exports = router
