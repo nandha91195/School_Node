@@ -10,12 +10,16 @@ router.get('/', (req, res) => {
     res.status(200).json({message:'server is ready to serve you'});
 })
 router.post('/school/add', schoolController.createSchool);
-router.post('/class/create',classController.createClass);
-router.post('/student/create',studentController.createStudent);
-
-router.post('/student/assignClass',schoolController.assignClasses);
 router.get('/school/get',schoolController.getOne);
-router.post('/section/create',classController.createSection);
+router.get('/school/getAll',schoolController.getAll);
+
+//class
+router.post('/class/create',classController.createClass);
 router.get('/class/getAll',classController.getAll);
+
+//student
+router.post('/student/create',studentController.createStudent);
+router.post('/student/assignClass',schoolController.assignClasses);
+router.post('/section/create',classController.createSection);
 
 module.exports = router

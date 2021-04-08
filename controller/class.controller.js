@@ -66,7 +66,7 @@ exports.getAll = async (req, res) => {
 
   return ReS(
     res,
-    { message: "Section fetched", section: exisistingSection },
+    { message: "Section fetched", class: exisistingSection },
     HttpStatus.OK
   );
 };

@@ -1,13 +1,12 @@
-const  School  = require("../models/school");
-const  Class  = require("../models/class");
+const School = require("../models/school");
+const Class = require("../models/class");
 const ObjectId = require("mongoose").Types.ObjectId;
-const { to, ReE, ReS, isNull } = require("../services/util.service");
+const { to, ReE, ReS, isNull, isEmpty } = require("../services/util.service");
 const HttpStatus = require("http-status");
 
 module.exports.createSchool = async (req, res) => {
-
+  console.log(req.body);
   let schoolName = req.body.schoolName;
-  let err, existingSchoolName, schoolCompany;
 
   if (isNull(schoolName)) {
     return ReE(
@@ -16,27 +15,30 @@ module.exports.createSchool = async (req, res) => {
       HttpStatus.BAD_REQUEST
     );
   }
-
-  [err, existingSchoolName] = await to(
-    School.findOne({ schoolName: schoolName, })
+  let [err1, existingSchoolName] = await to(
+    School.findOne({ schoolName: schoolName })
   );
 
-  if (err) {
+  if (err1) {
     return ReE(res, { message: "school already exist" });
   }
 
   if (existingSchoolName) {
-    return ReE(res, { message: "SchoolName already here" },HttpStatus.BAD_REQUEST);
+    return ReE(
+      res,
+      { message: "SchoolName already here" },
+      HttpStatus.BAD_REQUEST
+    );
   }
-  console.log(schoolCompany);
-  [err, schoolCompany] = await to(
+
+  let [err2, schoolCompany] = await to(
     School.create({
       schoolName: schoolName,
       active: true,
     })
   );
 
-  if (err) {
+  if (err2) {
     return ReE(res, { message: "School already Exist" });
   }
   return ReS(
@@ -47,20 +49,35 @@ module.exports.createSchool = async (req, res) => {
 };
 
 module.exports.assignClasses = async (req, res) => {
-  
-  let err, exisitingSchool,exisitingClasses,  saveSchool
+  let err, exisitingSchool, exisitingClasses, saveSchool;
 
   [err, exisitingSchool] = await to(School.findById(req.body.id));
 
-  if(err) { return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR)  }
+  if (err) {
+    return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 
-  if(!exisitingSchool) { return ReE(res, {message:'School doesn\'t found!, Try again'}, HttpStatus.BAD_REQUEST)}
+  if (!exisitingSchool) {
+    return ReE(
+      res,
+      { message: "School doesn't found!, Try again" },
+      HttpStatus.BAD_REQUEST
+    );
+  }
 
   [err, exisitingClasses] = await to(Class.find({}, {}));
 
-  if(err) { return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR)  }
+  if (err) {
+    return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 
-  if(exisitingClasses.length === 0) { return ReE(res, {message:'Classes doesn\'t found!, Try again'}, HttpStatus.BAD_REQUEST)}
+  if (exisitingClasses.length === 0) {
+    return ReE(
+      res,
+      { message: "Classes doesn't found!, Try again" },
+      HttpStatus.BAD_REQUEST
+    );
+  }
 
   let claasesIds = [];
 
@@ -73,28 +90,67 @@ module.exports.assignClasses = async (req, res) => {
 
   [err, saveSchool] = await to(exisitingSchool.save());
 
-  if(err) { return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR) }
+  if (err) {
+    return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 
-  if(!saveSchool) {return ReE(res, {message:'Classes do9esn\'t assig to school.'}, HttpStatus.BAD_REQUEST)}
+  if (!saveSchool) {
+    return ReE(
+      res,
+      { message: "Classes do9esn't assig to school." },
+      HttpStatus.BAD_REQUEST
+    );
+  }
 
-  return ReS(res, {meesage:'Classes assign sucess', school:exisitingSchool}, HttpStatus.OK)
-
-
-}
+  return ReS(
+    res,
+    { meesage: "Classes assign sucess", school: exisitingSchool },
+    HttpStatus.OK
+  );
+};
 
 module.exports.getOne = async (req, res) => {
-
   let err, exisitingSchool;
 
-  [err, exisitingSchool] = await to(School.findById(req.body.id).populate([{
+  [err, exisitingSchool] = await to(
+    School.findById(req.body.id).populate([
+      {
+        path: "classes",
+        select: ["className"],
+        model: "Class",
+      },
+    ])
+  );
+
+  if (err) {
+    return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  if (!exisitingSchool) {
+    return ReE(
+      res,
+      { message: "School doesn't found!, Try again" },
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  return ReS(
+    res,
+    { message: "School Found", school: exisitingSchool },
+    HttpStatus.OK
+  );
+};
+
+module.exports.getAll = async (req,res) => {
+
+  let err, existingSchools; 
+
+  [err, existingSchools] = await to(School.find(req.body.id).populate({
     path:"classes",
-    select:["className"],
+    select: ["className"],
     model:"Class",
-  }]));
+  }));
+  console.log(err, existingSchools);
+  return ReS(res, { message: 'School found!', schools: existingSchools }, HttpStatus.OK);
 
-  if(err) { return ReE(res, err, HttpStatus.INTERNAL_SERVER_ERROR)  }
-
-  if(!exisitingSchool) { return ReE(res, {message:'School doesn\'t found!, Try again'}, HttpStatus.BAD_REQUEST)}
-
-  return ReS(res, {message:'School Found', school:exisitingSchool}, HttpStatus.OK)
-}
+};
